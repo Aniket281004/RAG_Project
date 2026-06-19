@@ -1,10 +1,13 @@
 from langchain_chroma import Chroma
+from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from dotenv import load_dotenv
 
 load_dotenv()
 
-embeddings = OpenAIEmbeddings()
+embeddings = OllamaEmbeddings(
+    model="nomic-embed-text"
+)
 
 db = Chroma(
     persist_directory="vector_db",
@@ -12,7 +15,7 @@ db = Chroma(
 )
 
 retriever = db.as_retriever(
-    search_kwargs={"k": 5}
+    search_kwargs={"k": 3}
 )
 
 def retrieve(query: str):

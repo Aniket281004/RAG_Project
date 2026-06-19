@@ -40,11 +40,9 @@ class FallbackLLM:
         self.providers = providers
 
     def invoke(self, prompt):
-        print("ENTERED FALLBACK")
         last_exception = None
 
         for provider in self.providers:
-            print(f"Trying {provider}")
             try:
                 print(f"Trying {provider.__class__.__name__}")
                 return provider.invoke(prompt)
@@ -52,7 +50,7 @@ class FallbackLLM:
             except Exception as e:
                 print("INSIDE EXCEPT")
                 print("Exception type:", type(e))
-                print("Exception name:", type(e)._name_)
+                print("Exception name:", type(e).__name__)
                 print("Exception message:", e)
 
                 if self._should_fallback(e):
@@ -62,7 +60,10 @@ class FallbackLLM:
 
                 raise
 
-        raise last_exception
+        if last_exception is not None:
+            raise last_exception
+
+        raise RuntimeError("No LLM providers available")
 
     @staticmethod
     def _should_fallback(e):
@@ -77,7 +78,23 @@ class FallbackLLM:
             DeadlineExceeded,
         )
 
-        return isinstance(e, retryable)
+        if isinstance(e, retryable):
+            return True
+
+        status_code = getattr(e, "status_code", None)
+        if status_code == 429:
+            return True
+
+        response = getattr(e, "response", None)
+        if getattr(response, "status_code", None) == 429:
+            return True
+
+        message = str(e).lower()
+        return (
+            "insufficient_quota" in message
+            or "rate limit" in message
+            or "quota" in message
+        )
 llm = FallbackLLM([
     openai_llm,
     gemini_llm,

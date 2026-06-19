@@ -2,6 +2,7 @@ import json
 from langchain_core.messages import HumanMessage
 from src.retrieve import retrieve
 from src.llm import llm
+from src.utils import export_chunks_to_json
 
 
 def generate_final_answer(query: str):
@@ -9,6 +10,7 @@ def generate_final_answer(query: str):
     try:
         print(type(llm))
         chunks = retrieve(query)
+        export_chunks_to_json(chunks,"rag_results.json")
         if not chunks:
             return "I couldn't find any relevant information."
 
