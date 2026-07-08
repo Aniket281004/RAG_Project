@@ -6,4 +6,4 @@ uploads/
 .env
 __pycache__/
 *.pyc
-vector_db/
+question_vector_db/

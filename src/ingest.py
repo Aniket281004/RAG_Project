@@ -7,7 +7,6 @@ from unstructured.chunking.title import chunk_by_title
 from langchain_core.documents import Document 
 from langchain_chroma import Chroma
 from langchain_core.messages import HumanMessage
-from langchain_openai import OpenAIEmbeddings 
 from langchain_ollama import OllamaEmbeddings
 from dotenv import load_dotenv
 load_dotenv()
@@ -209,7 +208,6 @@ def run_complete_ingestion_pipeline(pdf_path:str = "./uplaods", persist_director
     if not os.path.exists(pdf_path):
         raise FileNotFoundError(f"{pdf_path} does not exist.")
     print("Starting RAG Ingestion Pipeline")
-    print("="*50)
     
     elements =[] 
     for filename in os.listdir(pdf_path):

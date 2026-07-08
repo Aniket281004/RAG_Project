@@ -48,6 +48,18 @@ def ingest():
         "message": "Vector database created successfully."
     }
 
+@app.post("/ingest/qp")
+def ingest():
+
+    run_complete_ingestion_pipeline(
+        pdf_path="./uploads/pyqs",
+        persist_directory = "question_vector_db"
+    )
+
+    return {
+        "message": "Vector database created successfully."
+    }
+
 
 @app.post("/ask")
 def ask(query: str):
