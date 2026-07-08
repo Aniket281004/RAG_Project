@@ -469,4 +469,3 @@ def run_question_paper_ingestion_pipeline(
     print(f"Questions Stored : {len(documents)}")
     return db
 
-run_question_paper_ingestion_pipeline()
