@@ -5,7 +5,11 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from src.pyq_ingestion import run_question_paper_ingestion_pipeline
 from src.ingest import run_complete_ingestion_pipeline
 from src.rag import generate_final_answer
+from pydantic import BaseModel
 
+class QueryRequest(BaseModel):
+    query: str
+    
 app = FastAPI()
 
 UPLOAD_DIR = Path("uploads")
@@ -70,29 +74,23 @@ def ingest():
         persist_directory="vector_db"
     )
 
-    return {
-        "message": "Vector database created successfully."
-    }
-
-@app.post("/ingest/qp")
-def ingest():
-
     run_question_paper_ingestion_pipeline(
         pdf_path="./uploads/pyqs",
-        persist_directory = "question_vector_db"
+        persist_directory="question_vector_db"
     )
 
     return {
-        "message": "Vector database created successfully."
+        "message": "Knowledge base built successfully."
     }
 
 
-@app.post("/ask")
-def ask(query: str):
 
-    answer = generate_final_answer(query)
+@app.post("/ask")
+def ask(request: QueryRequest):
+
+    answer = generate_final_answer(request.query)
 
     return {
-        "question": query,
+        "question": request.query,
         "answer": answer
     }
