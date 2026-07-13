@@ -185,7 +185,7 @@ def summarise_chunks(chunks):
     return langchain_documents
 
 
-def create_vector_store(documents,persist_directory="vector_db"):
+def create_vector_store(documents,persist_directory="vector_db/study_material"):
     print("Creatng embeddings and storing in ChromaDB...")
     embedding_model = OllamaEmbeddings(
         model="nomic-embed-text"
@@ -203,7 +203,7 @@ def create_vector_store(documents,persist_directory="vector_db"):
     return vectorstore
 
 
-def run_complete_ingestion_pipeline(pdf_path:str = "./uplaods", persist_directory = "vector_db"):
+def run_complete_ingestion_pipeline(pdf_path:str = "./uplaods", persist_directory = "vector_db/study_material"):
     """Run the complete RAG ingestion pipeline"""
     if not os.path.exists(pdf_path):
         raise FileNotFoundError(f"{pdf_path} does not exist.")

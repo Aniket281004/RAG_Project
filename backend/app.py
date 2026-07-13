@@ -6,11 +6,19 @@ from src.pyq_ingestion import run_question_paper_ingestion_pipeline
 from src.ingest import run_complete_ingestion_pipeline
 from src.rag import generate_final_answer
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 class QueryRequest(BaseModel):
     query: str
-    
-app = FastAPI()
 
 UPLOAD_DIR = Path("uploads")
 STUDY_DIR = UPLOAD_DIR / "study_material"
@@ -66,31 +74,67 @@ async def upload_pyqs(files: List[UploadFile] = File(...)):
     }
 
 
-@app.post("/ingest")
-def ingest():
+@app.get("/files")
+def get_uploaded_files():
+    study_files = [
+        file.name
+        for file in STUDY_DIR.iterdir()
+        if file.is_file()
+    ]
 
-    run_complete_ingestion_pipeline(
-        pdf_path="./uploads/study_material",
-        persist_directory="vector_db"
-    )
-
-    run_question_paper_ingestion_pipeline(
-        pdf_path="./uploads/pyqs",
-        persist_directory="question_vector_db"
-    )
+    pyq_files = [
+        file.name
+        for file in PYQ_DIR.iterdir()
+        if file.is_file()
+    ]
 
     return {
-        "message": "Knowledge base built successfully."
+        "study_files": study_files,
+        "pyq_files": pyq_files
+    }
+@app.post("/ingest")
+def ingest():
+    study_path = Path("./uploads/study_material")
+    pyq_path = Path("./uploads/pyqs")
+
+    study_files = list(study_path.glob("*.pdf"))
+    pyq_files = list(pyq_path.glob("*.pdf"))
+
+    if not study_files and not pyq_files:
+        raise HTTPException(
+            status_code=400,
+            detail="No files available for ingestion"
+        )
+
+    ingested = []
+
+    if study_files:
+        run_complete_ingestion_pipeline(
+            pdf_path=str(study_path),
+            persist_directory="vector_db/study_material"
+        )
+
+        ingested.append("study_material")
+
+    if pyq_files:
+        run_question_paper_ingestion_pipeline(
+            pdf_path=str(pyq_path),
+            persist_directory="vector_db/pyqs"
+        )
+
+        ingested.append("pyqs")
+
+    return {
+        "message": "Knowledge base built successfully",
+        "ingested": ingested
     }
 
 
-
 @app.post("/ask")
-def ask(request: QueryRequest):
-
-    answer = generate_final_answer(request.query)
+def ask(query: str):
+    answer = generate_final_answer(query)
 
     return {
-        "question": request.query,
+        "question": query,
         "answer": answer
     }

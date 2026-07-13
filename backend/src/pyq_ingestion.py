@@ -384,7 +384,7 @@ def build_question_documents(
 
 def create_vector_store(
     documents,
-    persist_directory="question_vector_db"
+    persist_directory="vector_db/pyqs"
 ):
     """
     Create Chroma Vector Store.
@@ -468,4 +468,3 @@ def run_question_paper_ingestion_pipeline(
     print("Question Paper Ingestion Complete")
     print(f"Questions Stored : {len(documents)}")
     return db
-

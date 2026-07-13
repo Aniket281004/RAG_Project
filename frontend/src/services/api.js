@@ -1,74 +1,66 @@
-import axios from "axios";
+const BASE_URL = "http://127.0.0.1:8000";
 
-const api = axios.create({
-    baseURL: "http://127.0.0.1:8000",
-    headers: {
-        "Content-Type": "application/json",
-    },
-});
+const uploadFile = async (file, endpoint) => {
+  const formData = new FormData();
 
-export default api;
+  formData.append("files", file);
 
-/* ---------------- Upload APIs ---------------- */
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    method: "POST",
+    body: formData,
+  });
 
-export const uploadStudyMaterial = async (files) => {
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error);
+  }
 
-    const formData = new FormData();
-
-    Array.from(files).forEach((file) => {
-        formData.append("files", file);
-    });
-
-    const response = await api.post(
-        "/upload/study-material",
-        formData,
-        {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        }
-    );
-
-    return response.data;
+  return response.json();
 };
 
-export const uploadPYQs = async (files) => {
-
-    const formData = new FormData();
-
-    Array.from(files).forEach((file) => {
-        formData.append("files", file);
-    });
-
-    const response = await api.post(
-        "/upload/pyqs",
-        formData,
-        {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        }
-    );
-
-    return response.data;
+export const uploadStudyMaterial = (file) => {
+  return uploadFile(file, "/upload/study-material");
 };
 
-/* ---------------- Ingestion API ---------------- */
-
-export const buildKnowledgeBase = async () => {
-
-    const response = await api.post("/ingest");
-
-    return response.data;
+export const uploadPyqs = (file) => {
+  return uploadFile(file, "/upload/pyqs");
 };
 
-/* ---------------- RAG API ---------------- */
+export const getUploadedFiles = async () => {
+  const response = await fetch(`${BASE_URL}/files`);
 
-export const askQuestion = async (query) => {
+  if (!response.ok) {
+    throw new Error("Failed to fetch uploaded files");
+  }
 
-    const response = await api.post("/ask", {
-        query: query,
-    });
+  return response.json();
+};
 
-    return response.data;
+export const generateAnswer = async (query) => {
+  const response = await fetch(
+    `${BASE_URL}/ask?query=${encodeURIComponent(query)}`,
+    {
+      method: "POST",
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error);
+  }
+
+  return response.json();
+};
+
+export const ingestFiles = async () => {
+  const response = await fetch(`${BASE_URL}/ingest`, {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error);
+  }
+
+  return response.json();
 };

@@ -1,9 +1,9 @@
-function Navbar(){
-    return (
-        <header className="navbar">
-            <h1>RAG Assistant</h1>
-        </header>
-    );
+function Navbar() {
+  return (
+    <nav className="navbar">
+      <h1>Question Paper Generator</h1>
+    </nav>
+  );
 }
 
 export default Navbar;
