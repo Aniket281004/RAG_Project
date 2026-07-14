@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-
+import "./index.css";
+import "./App.css";
 import Navbar from "./components/Navbar";
 import UploadCard from "./components/UploadCard";
 import UploadedFiles from "./components/UploadedFiles";
@@ -103,10 +104,8 @@ function App() {
   };
 
   return (
-    <>
-      <Navbar />
-
-      <main>
+    <div className="app-container">
+      <aside className="left-sidebar">
         <div className="upload-container">
           <UploadCard
             title="Study Material"
@@ -119,32 +118,36 @@ function App() {
           />
         </div>
 
-        <Button
-          onClick={handleUpload}
-          disabled={uploading || totalFiles === 0}
-        >
-          {uploading ? "Uploading..." : "Upload Files"}
-        </Button>
+        <div className="action-buttons">
+          <Button
+            onClick={handleUpload}
+            disabled={uploading || totalFiles === 0}
+          >
+            {uploading ? "Uploading..." : "Upload Files"}
+          </Button>
+
+          <Button
+            onClick={handleIngest}
+            disabled={ingesting}
+            className="secondary"
+          >
+            {ingesting ? "Ingesting..." : "Ingest"}
+          </Button>
+        </div>
 
         {uploading && (
           <p>
             Uploaded {uploaded} / {totalFiles}
           </p>
         )}
+      </aside>
 
-        <UploadedFiles
-          studyFiles={uploadedStudyFiles}
-          pyqFiles={uploadedPyqFiles}
-        />
-
-        <Button
-          onClick={handleIngest}
-          disabled={ingesting}
-        >
-          {ingesting
-            ? "Building..."
-            : "Build Knowledge Base"}
-        </Button>
+      <main className="main-content">
+        <section className="hero-card">
+          <p className="eyebrow">AI Study Assistant</p>
+          <h1>Turn your notes into polished question papers.</h1>
+          <p>Upload study material and previous papers, then generate a clear paper in seconds.</p>
+        </section>
 
         <QueryBox
           query={query}
@@ -155,7 +158,14 @@ function App() {
 
         <AnswerBox answer={answer} />
       </main>
-    </>
+
+      <aside className="right-sidebar">
+        <UploadedFiles
+          studyFiles={uploadedStudyFiles}
+          pyqFiles={uploadedPyqFiles}
+        />
+      </aside>
+    </div>
   );
 }
 

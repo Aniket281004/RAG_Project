@@ -3,26 +3,26 @@ function UploadedFiles({ studyFiles, pyqFiles }) {
     <div className="uploaded-files">
       <h2>Uploaded Files</h2>
 
-      <div>
+      <div className="sidebar-section">
         <h3>Study Material</h3>
 
         {studyFiles.length === 0 ? (
-          <p>No study material uploaded</p>
+          <p className="empty-state">No study material uploaded</p>
         ) : (
           studyFiles.map((file) => (
-            <p key={file}>{file}</p>
+            <div className="file-row" key={file}>{file}</div>
           ))
         )}
       </div>
 
-      <div>
+      <div className="sidebar-section">
         <h3>Previous Year Papers</h3>
 
         {pyqFiles.length === 0 ? (
-          <p>No PYQs uploaded</p>
+          <p className="empty-state">No PYQs uploaded</p>
         ) : (
           pyqFiles.map((file) => (
-            <p key={file}>{file}</p>
+            <div className="file-row" key={file}>{file}</div>
           ))
         )}
       </div>
